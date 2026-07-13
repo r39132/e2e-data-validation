@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Oneof {
+  string id = 1;
+  
+  oneof payload {
+    string text_data = 2;
+    int32 numeric_data = 3;
+    bool flag_data = 4;
+  }
+}

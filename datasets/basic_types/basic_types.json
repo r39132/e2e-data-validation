@@ -1,0 +1,24 @@
+[
+  {
+    "int32_field": 42,
+    "int64_field": 9223372036854775807,
+    "uint32_field": 4294967295,
+    "uint64_field": 18446744073709551615,
+    "float_field": 3.14,
+    "double_field": 2.718281828,
+    "bool_field": true,
+    "string_field": "Hello, Protobuf!",
+    "bytes_field": "62696e6172792064617461"
+  },
+  {
+    "int32_field": -100,
+    "int64_field": -1234567890,
+    "uint32_field": 0,
+    "uint64_field": 12345,
+    "float_field": -99.9,
+    "double_field": 0.0,
+    "bool_field": false,
+    "string_field": "Test \u6d4b\u8bd5",
+    "bytes_field": "000102ff"
+  }
+]

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message OptionalFields {
+  string required_field = 1;
+  optional string optional_string = 2;
+  optional int32 optional_int = 3;
+  optional bool optional_bool = 4;
+}

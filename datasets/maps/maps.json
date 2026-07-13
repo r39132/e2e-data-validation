@@ -1,0 +1,24 @@
+[
+  {
+    "scores": {
+      "Alice": 95,
+      "Bob": 87,
+      "Charlie": 92
+    },
+    "metadata": {
+      "version": "1.0",
+      "author": "test",
+      "status": "active"
+    },
+    "prices": {
+      "USD": {
+        "amount": 100.0,
+        "currency": "USD"
+      },
+      "EUR": {
+        "amount": 85.0,
+        "currency": "EUR"
+      }
+    }
+  }
+]

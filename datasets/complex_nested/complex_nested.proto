@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+message ComplexNested {
+  message Person {
+    string name = 1;
+    int32 age = 2;
+    
+    message ContactInfo {
+      string email = 1;
+      repeated string phones = 2;
+    }
+    ContactInfo contact = 3;
+  }
+  
+  message Department {
+    string name = 1;
+    repeated Person employees = 2;
+    map<string, string> metadata = 3;
+  }
+  
+  string company = 1;
+  repeated Department departments = 2;
+}

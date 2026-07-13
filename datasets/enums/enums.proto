@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+message Enums {
+  enum Status {
+    UNKNOWN = 0;
+    PENDING = 1;
+    APPROVED = 2;
+    REJECTED = 3;
+  }
+  
+  enum Priority {
+    LOW = 0;
+    MEDIUM = 1;
+    HIGH = 2;
+    CRITICAL = 3;
+  }
+  
+  Status status = 1;
+  Priority priority = 2;
+  string description = 3;
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message NestedMessages {
+  message Address {
+    string street = 1;
+    string city = 2;
+    int32 zip_code = 3;
+  }
+  
+  string name = 1;
+  Address address = 2;
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "rec1",
+    "text_data": "Hello"
+  },
+  {
+    "id": "rec2",
+    "numeric_data": 42
+  },
+  {
+    "id": "rec3",
+    "flag_data": true
+  }
+]

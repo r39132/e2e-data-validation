@@ -1,0 +1,10 @@
+[
+  {
+    "required_field": "always present",
+    "optional_string": "sometimes here",
+    "optional_int": 100
+  },
+  {
+    "required_field": "also present"
+  }
+]

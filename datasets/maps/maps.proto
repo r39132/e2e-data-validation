@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message Maps {
+  map<string, int32> scores = 1;
+  map<string, string> metadata = 2;
+  
+  message Value {
+    double amount = 1;
+    string currency = 2;
+  }
+  map<string, Value> prices = 3;
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "numbers": [
+      1,
+      2,
+      3,
+      5,
+      8,
+      13,
+      21
+    ],
+    "tags": [
+      "important",
+      "urgent",
+      "review"
+    ],
+    "items": [
+      {
+        "name": "Apple",
+        "price": 1.99
+      },
+      {
+        "name": "Banana",
+        "price": 0.59
+      },
+      {
+        "name": "Orange",
+        "price": 2.49
+      }
+    ]
+  }
+]
