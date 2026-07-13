@@ -28,16 +28,16 @@ graph TB
     
     Step1 --> Gen1[Create .proto files]
     Step1 --> Gen2[Generate test data]
-    Step1 --> Gen3[Compile .proto → Python]
+    Step1 --> Gen3[Compile .proto -> Python]
     Step1 --> Gen4[Serialize to .pb3 binary]
     Gen1 & Gen2 & Gen3 & Gen4 --> Step2
     
     Step2[Step 2: Infer Schema] --> Infer1[Parse .proto files]
-    Infer1 --> Infer2[Map protobuf types → Parquet types]
+    Infer1 --> Infer2[Map protobuf types -> Parquet types]
     Infer2 --> Infer3[Generate PyArrow schema]
     Infer3 --> Step3
     
-    Step3[Step 3: Convert PB3 → Parquet] --> Conv1[Read .pb3 binary]
+    Step3[Step 3: Convert PB3 -> Parquet] --> Conv1[Read .pb3 binary]
     Conv1 --> Conv2[Deserialize protobuf messages]
     Conv2 --> Conv3[Transform to PyArrow tables]
     Conv3 --> Conv4[Write .parquet files]
