@@ -18,6 +18,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 │   └── pipeline.ipynb     # Main pipeline execution notebook
 ├── docs/                  # Dataset documentation
 └── pyproject.toml         # Project configuration
+```
 
 ## Pipeline Data Flow
 
