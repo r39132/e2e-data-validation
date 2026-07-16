@@ -125,6 +125,10 @@ See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls.md)** for:
 
 ## Proto3 vs Parquet Compatibility
 
+See **[Java Considerations](docs/java_considerations.md)** for:
+- How a Java/`parquet-java` implementation differs from this Python/PyArrow pipeline
+- The `setWriteSpecsCompliant` flag, integer promotion risks, and library stack comparison
+
 See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/compatibility_analysis.md)** for:
 - Master compatibility table reconciling empirical and analytical findings
 - Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)

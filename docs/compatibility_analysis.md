@@ -7,6 +7,7 @@ to prescribe the best practices for achieving reliable bidirectional compatibili
 **Related reading:**
 - [Pipeline Results](results.md) — empirical 8/8 pipeline pass data
 - [Common Pitfalls and Conversion Bugs](common_pitfalls.md) — bugs found during development and their fixes
+- [Java Considerations](java_considerations.md) — how a Java implementation would differ
 - [Codebase Guide](codebase.md) — how the pipeline code works
 
 ---
