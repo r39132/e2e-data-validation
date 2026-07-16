@@ -84,7 +84,7 @@ Enum **symbolic names are not preserved** in Parquet. A Parquet reader sees `2` 
 `status`, not `"APPROVED"`. The `.proto` schema is required to reconstruct the mapping.
 For analytics workloads where names matter, consider converting enum fields to strings
 before writing. See the
-[Proto3 vs Parquet Compatibility Analysis](../data_format_compatibility_analysis.md#22-enum--names-and-range-validation-dropped)
+[Proto3 vs Parquet Compatibility Analysis](../compatibility_analysis.md#22-enum--names-and-range-validation-dropped)
 for recommendations.
 
 ## Validation Points

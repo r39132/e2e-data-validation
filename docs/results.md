@@ -36,11 +36,11 @@ deliberately blind to structural and semantic constraints.
 
 The 8/8 pass result is correct and meaningful: it proves that **no data values are
 corrupted or dropped** during conversion. The ⚠️ and ❌ rows in the
-[Data Format Compatibility Analysis](data_format_compatibility_analysis.md) describe
+[Data Format Compatibility Analysis](compatibility_analysis.md) describe
 losses that a value comparator cannot detect — they require schema inspection, API
 calls (`WhichOneof`, `HasField`), or dataset coverage that the current test suite does
 not include.
 
 **Related reading:**
 - [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — bugs uncovered during development and their fixes
-- [Data Format Compatibility Analysis](data_format_compatibility_analysis.md) — full type compatibility table and recommendations
+- [Data Format Compatibility Analysis](compatibility_analysis.md) — full type compatibility table and recommendations

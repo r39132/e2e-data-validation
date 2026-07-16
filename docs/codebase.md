@@ -8,7 +8,7 @@ data to Apache Parquet and validates the round-trip fidelity field-by-field.
 - [README](../README.md) — quick start and project structure
 - [Pipeline Results](results.md) — empirical results, bugs found and fixed
 - [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — root causes and fixes for bugs encountered
-- [Proto3 vs Parquet Compatibility](data_format_compatibility_analysis.md) — type compatibility analysis and recommendations
+- [Proto3 vs Parquet Compatibility](compatibility_analysis.md) — type compatibility analysis and recommendations
 
 ---
 
@@ -358,6 +358,6 @@ e2e_conversion_validator.ipynb  (orchestration)
 | `protobuf 7.x` `FieldDescriptor.label` not an instance attribute | C extension (`_upb`) backend | Import `FieldDescriptor` from class; fall back to `type(value).__name__` inspection |
 | Pandas returns numpy arrays for `LIST` columns | `to_pandas()` conversion | `_normalize_parquet_record` recursively converts to Python lists |
 | Pandas returns list-of-tuples for `MAP` columns | `to_pandas()` conversion | `_compare_records` calls `dict()` on Parquet maps before comparison |
-| `oneof` mutual exclusivity not preserved | No discriminated union in Parquet | Not fixed; documented in [compatibility analysis](data_format_compatibility_analysis.md) |
-| `enum` symbolic names lost | Stored as `int32` | Not fixed; documented in [compatibility analysis](data_format_compatibility_analysis.md) |
-| `google.protobuf.Any` / `Struct` not supported | No fixed schema possible | Not tested; documented as coverage gap in [compatibility analysis](data_format_compatibility_analysis.md) |
+| `oneof` mutual exclusivity not preserved | No discriminated union in Parquet | Not fixed; documented in [compatibility analysis](compatibility_analysis.md) |
+| `enum` symbolic names lost | Stored as `int32` | Not fixed; documented in [compatibility analysis](compatibility_analysis.md) |
+| `google.protobuf.Any` / `Struct` not supported | No fixed schema possible | Not tested; documented as coverage gap in [compatibility analysis](compatibility_analysis.md) |

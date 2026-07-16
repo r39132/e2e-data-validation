@@ -5,7 +5,7 @@ in Python, along with their root causes and fixes. Each pitfall is general — i
 hit any project doing this conversion, not just this one.
 
 **Related reading:**
-- [Data Format Compatibility Analysis](data_format_compatibility_analysis.md) — type-level compatibility and recommendations
+- [Data Format Compatibility Analysis](compatibility_analysis.md) — type-level compatibility and recommendations
 - [Codebase Guide](codebase.md) — how the pipeline is implemented
 - [Pipeline Results](results.md) — empirical pass/fail results across 8 datasets
 

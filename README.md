@@ -125,7 +125,7 @@ See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls_and_conversion_
 
 ## Proto3 vs Parquet Compatibility
 
-See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/data_format_compatibility_analysis.md)** for:
+See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/compatibility_analysis.md)** for:
 - Master compatibility table reconciling empirical and analytical findings
 - Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)
 - Recommendations on algorithms, libraries, and types to avoid
