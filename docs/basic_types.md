@@ -26,6 +26,7 @@ Tests that each type correctly stores and round-trips its largest representable 
 > **Boundary column** — the canonical named constant (from C/C++ `<climits>` / `<cfloat>` headers and IEEE 754) that formally defines the limit being tested. Both Protobuf 3 and Parquet/PyArrow use the same underlying binary representations (two's complement integers and IEEE 754 floats), so these limits are identical and enforced in both formats. A value at `INT32_MAX` in the `.pb3` file will be stored as exactly `INT32_MAX` in the Parquet `INT32` column — no clamping, promotion, or loss occurs at either boundary.
 
 | Field | Value | Boundary |
+|---|---|---|
 | `int32_field` | `2147483647` | `INT32_MAX` |
 | `int64_field` | `9223372036854775807` | `INT64_MAX` |
 | `uint32_field` | `4294967295` | `UINT32_MAX` |
