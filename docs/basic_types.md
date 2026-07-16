@@ -23,8 +23,9 @@ Tests all Protocol Buffer 3 scalar primitive types to ensure proper conversion t
 ### Record 1: Overflow boundaries (maximum positive values)
 Tests that each type correctly stores and round-trips its largest representable value.
 
+> **Boundary column** — the canonical named constant (from C/C++ `<climits>` / `<cfloat>` headers and IEEE 754) that formally defines the limit being tested. Both Protobuf 3 and Parquet/PyArrow use the same underlying binary representations (two's complement integers and IEEE 754 floats), so these limits are identical and enforced in both formats. A value at `INT32_MAX` in the `.pb3` file will be stored as exactly `INT32_MAX` in the Parquet `INT32` column — no clamping, promotion, or loss occurs at either boundary.
+
 | Field | Value | Boundary |
-|---|---|---|
 | `int32_field` | `2147483647` | `INT32_MAX` |
 | `int64_field` | `9223372036854775807` | `INT64_MAX` |
 | `uint32_field` | `4294967295` | `UINT32_MAX` |
@@ -36,7 +37,7 @@ Tests that each type correctly stores and round-trips its largest representable 
 | `bytes_field` | `"binary data"` | — (no overflow/underflow concept) |
 
 ### Record 2: Underflow boundaries (minimum / most-negative values)
-Tests that each type correctly stores and round-trips its most-negative (or smallest) representable value.
+Tests that each type correctly stores and round-trips its most-negative (or smallest) representable value. The same format-compatibility guarantee applies: `INT32_MIN`, `INT64_MIN`, and `-FLT_MAX` / `-DBL_MAX` are enforceable and losslessly preserved in both pb3 and Parquet.
 
 | Field | Value | Boundary | Notes |
 |---|---|---|---|
