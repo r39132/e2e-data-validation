@@ -2,81 +2,84 @@
 
 ## Purpose
 
-Tests the `optional` keyword in Proto3, which explicitly marks fields as optional and provides presence tracking.
-
-## Structure
-
-```
-OptionalFields
-├── required_field: string
-├── optional_string: string (optional)
-├── optional_int: int32 (optional)
-└── optional_bool: bool (optional)
-```
+Tests the `optional` keyword introduced in proto3, which adds **explicit field
+presence tracking** — the ability to distinguish between "field not set" and "field
+set to its zero value". This is one of the cleaner proto→Parquet mappings: `optional`
+fields become nullable columns, and `null` in Parquet faithfully represents an unset
+field.
 
 ## Protobuf Definition
 
 ```protobuf
 message OptionalFields {
-  string required_field = 1;
+  string          required_field  = 1;
   optional string optional_string = 2;
-  optional int32 optional_int = 3;
-  optional bool optional_bool = 4;
+  optional int32  optional_int    = 3;
+  optional bool   optional_bool   = 4;
 }
 ```
 
-## Proto2 vs Proto3 Optional
+### Proto3 presence tracking: default vs `optional`
 
-**Proto3 (default):**
-- No presence tracking by default
-- Zero values (0, false, "") indistinguishable from unset
-- No `has_*` methods
+| Scenario | Proto3 default field | Proto3 `optional` field | Parquet column |
+|---|---|---|---|
+| Field not set | `0` / `""` / `false` (indistinguishable from set-to-zero) | `null` | `null` |
+| Field set to zero value | `0` / `""` / `false` | `0` / `""` / `false` | `0` / `""` / `false` |
 
-**Proto3 with `optional`:**
-- Explicit presence tracking
-- Can distinguish between set-to-zero and unset
-- Generates `has_*` methods
+Without `optional`, proto3 cannot represent absence for scalar fields — unset and
+set-to-zero look identical. With `optional`, the `HasField()` API and a nullable
+Parquet column preserve the distinction.
 
 ## Parquet Schema
 
-All fields are nullable in Parquet:
-
 ```
-required_field: STRING (nullable: false in practice)
-optional_string: STRING (nullable: true)
-optional_int: INT32 (nullable: true)
-optional_bool: BOOLEAN (nullable: true)
+required_field:  STRING  (non-nullable)
+optional_string: STRING  (nullable)
+optional_int:    INT32   (nullable)
+optional_bool:   BOOLEAN (nullable)
 ```
 
 ## Test Data
 
-### Record 1 (Some fields set)
-- required_field: "always present"
-- **optional_string**: "sometimes here" (set)
-- **optional_int**: 100 (set)
-- optional_bool: null (unset)
+Two records cover both extremes: all optional fields populated, and all optional
+fields absent.
 
-### Record 2 (Minimal)
-- required_field: "also present"
-- optional_string: null (unset)
-- optional_int: null (unset)
-- optional_bool: null (unset)
+### Record 1 — optional fields set
+```json
+{
+  "required_field":  "always present",
+  "optional_string": "sometimes here",
+  "optional_int":    100
+}
+```
+`optional_bool` is absent from the JSON (unset in proto), so it becomes `null` in
+Parquet. `optional_string` and `optional_int` are set and carry real values.
+
+### Record 2 — all optional fields absent
+```json
+{
+  "required_field": "also present"
+}
+```
+All three `optional` fields are absent → all three are `null` in Parquet.
+`required_field` is present in both records, confirming it is never null.
+
+## What This Dataset Proves
+
+| Aspect | Verified |
+|---|---|
+| Set `optional` fields carry their values through to Parquet | ✓ |
+| Unset `optional` fields become `null` in Parquet (not zero) | ✓ |
+| `required_field` is non-null in every record | ✓ |
+| Mixed presence within a single record (some set, some unset) | ✓ (Record 1) |
+| All optional fields simultaneously unset | ✓ (Record 2) |
 
 ## Validation Points
 
-✓ Set optional fields have correct values  
-✓ Unset optional fields are null in Parquet  
-✓ Required fields always present  
-✓ Null vs zero-value distinction maintained
-
-## Key Differences
-
-| Scenario | Proto3 Default | Proto3 Optional | Parquet |
-|----------|---------------|-----------------|---------|
-| Unset int32 | 0 (no presence) | null (has presence) | null |
-| Set to 0 | 0 (no presence) | 0 (has presence) | 0 |
-| Unset string | "" (no presence) | null (has presence) | null |
-| Set to "" | "" (no presence) | "" (has presence) | "" |
+✓ Set optional field values are accurate  
+✓ Unset optional fields are `null` in Parquet  
+✓ `required_field` is always non-null  
+✓ Null vs zero-value distinction is maintained
 
 ## Use Cases
 

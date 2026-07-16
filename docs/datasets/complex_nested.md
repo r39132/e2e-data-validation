@@ -2,23 +2,10 @@
 
 ## Purpose
 
-Tests deeply nested structures combining multiple Protobuf features: nested messages, repeated fields, and maps together in a realistic hierarchy.
-
-## Structure
-
-```
-ComplexNested
-├── company: string
-└── departments: repeated Department
-    ├── name: string
-    ├── employees: repeated Person
-    │   ├── name: string
-    │   ├── age: int32
-    │   └── contact: ContactInfo
-    │       ├── email: string
-    │       └── phones: repeated string
-    └── metadata: map<string, string>
-```
+Tests that deeply nested structures — combining `repeated` fields, nested `message`
+types, and `map` fields together in a multi-level hierarchy — convert correctly to
+Parquet. This is the most structurally complex dataset in the suite and was the one
+that exposed the schema inference bugs fixed during development.
 
 ## Protobuf Definition
 
@@ -68,24 +55,71 @@ departments: LIST<STRUCT<
 
 ## Test Data
 
-**Company:** Tech Corp
+There is one record. Its structure exercises four nesting levels simultaneously:
+`LIST` of `STRUCT` (`departments`) containing a `LIST` of `STRUCT` (`employees`)
+containing a `STRUCT` (`contact`) containing a `LIST` (`phones`), alongside a `MAP`
+at the department level.
 
-**Engineering Department:**
-- Alice (30)
-  - Email: alice@example.com
-  - Phones: ["+1-555-0001", "+1-555-0002"]
-- Bob (35)
-  - Email: bob@example.com
-  - Phones: ["+1-555-0003"]
-- Metadata: {"location": "Building A", "floor": "3"}
+```json
+{
+  "company": "Tech Corp",
+  "departments": [
+    {
+      "name": "Engineering",
+      "employees": [
+        {
+          "name": "Alice",
+          "age": 30,
+          "contact": {
+            "email": "alice@example.com",
+            "phones": ["+1-555-0001", "+1-555-0002"]
+          }
+        },
+        {
+          "name": "Bob",
+          "age": 35,
+          "contact": {
+            "email": "bob@example.com",
+            "phones": ["+1-555-0003"]
+          }
+        }
+      ],
+      "metadata": {
+        "location": "Building A",
+        "floor": "3"
+      }
+    }
+  ]
+}
+```
+
+Alice has two phone numbers; Bob has one. This variation tests that `LIST<STRING>`
+lengths are tracked per element, not globally. The `metadata` map at the department
+level combines `MAP` and `STRUCT` in the same parent.
+
+## What This Dataset Proves
+
+| Aspect | Where tested |
+|---|---|
+| `LIST<STRUCT>` round-trips correctly | `departments` |
+| `LIST<STRUCT<LIST<STRUCT>>>` (nested repeated messages) | `departments[*].employees` |
+| `STRUCT` nested inside a `STRUCT` inside a `LIST` | `departments[*].employees[*].contact` |
+| `LIST<STRING>` with varying lengths per parent element | `contact.phones` (Alice: 2, Bob: 1) |
+| `MAP<STRING, STRING>` nested inside a `STRUCT` | `departments[*].metadata` |
+| Schema inference handles 4+ levels of brace nesting | Entire message |
+
+The schema inference bug that was fixed during development (bracket-counting parser)
+was discovered specifically on this dataset. See
+[Results and Analysis](../../Results_and_Analysis.md#2a-regex-could-not-handle-more-than-one-level-of-brace-nesting)
+for details.
 
 ## Validation Points
 
-✓ Three levels of nesting preserved  
-✓ Repeated fields at multiple levels accurate  
-✓ Nested structs maintain integrity  
-✓ Maps within structs converted correctly  
-✓ Field paths accessible in Parquet
+✓ Four levels of nesting preserved  
+✓ `LIST` lengths correct at every nesting level  
+✓ Per-element `LIST` lengths independent (Alice's 2 phones ≠ Bob's 1 phone)  
+✓ Nested `STRUCT` field values accurate at all depths  
+✓ `MAP` inside a `STRUCT` inside a `LIST` round-trips correctly
 
 ## Complexity Analysis
 
