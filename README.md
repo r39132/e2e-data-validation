@@ -112,6 +112,22 @@ See **[Results and Analysis](Results_and_Analysis.md)** for:
 - Bugs found and fixed during development
 - Detailed Protobuf → Parquet semantic mapping, including known information-loss cases (`oneof`, enum names, wire encoding variants)
 
+## Proto3 vs Parquet Compatibility
+
+See **[Proto3 vs Parquet Data Type Compatibility Analysis](Proto3_Parquet_Compatibility.md)** for:
+- Master compatibility table reconciling empirical and analytical findings
+- Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)
+- Recommendations on algorithms, libraries, and types to avoid
+- Coverage gaps and next steps
+
+## Codebase Guide
+
+See **[Codebase Guide](docs/codebase.md)** for:
+- Architecture overview and data flow
+- Module-by-module explanation (`generator.py`, `schema_inference.py`, `converter.py`, `validator.py`)
+- Key algorithms: varint reading, bracket-counting proto parser, schema-from-proto
+- Known limitations and their workarounds
+
 ## Usage
 
 ```bash
