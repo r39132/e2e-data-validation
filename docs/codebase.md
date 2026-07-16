@@ -27,7 +27,7 @@ data to Apache Parquet and validates the round-trip fidelity field-by-field.
 
 ## 1. Architecture Overview
 
-The pipeline has four stages executed in sequence from `notebooks/pipeline.ipynb`:
+The pipeline has four stages executed in sequence from `notebooks/e2e_conversion_validator.ipynb`:
 
 ```
 .proto file                    .pb3 binary
@@ -333,7 +333,7 @@ generator.py
        ├─ import <name>_pb2
        └─ write <name>.pb3  (varint-delimited binary stream)
 
-pipeline.ipynb  (orchestration)
+e2e_conversion_validator.ipynb  (orchestration)
   │
   ├─ Step 1: DatasetGenerator.generate_all_datasets()
   │

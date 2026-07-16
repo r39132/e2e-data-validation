@@ -21,7 +21,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 │   ├── converter.py       # Convert pb3 to parquet
 │   └── validator.py       # Validate conversion results
 ├── notebooks/             # Jupyter notebooks
-│   └── pipeline.ipynb     # Main pipeline execution notebook
+│   └── e2e_conversion_validator.ipynb  # Main pipeline execution notebook
 ├── docs/                  # Documentation
 │   ├── datasets/          # Per-dataset documentation
 │   ├── codebase.md        # Codebase guide
@@ -143,7 +143,7 @@ See **[Codebase Guide](docs/codebase.md)** for:
 
 ```bash
 # Run the complete pipeline
-jupyter notebook notebooks/pipeline.ipynb
+jupyter notebook notebooks/e2e_conversion_validator.ipynb
 ```
 
 The notebook will execute all 5 pipeline steps and generate a comprehensive report showing which datasets passed validation.

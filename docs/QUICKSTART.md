@@ -18,7 +18,7 @@ pip install uv
 uv pip install -e .
 
 # 5. Launch Jupyter and run the pipeline
-jupyter notebook notebooks/pipeline.ipynb
+jupyter notebook notebooks/e2e_conversion_validator.ipynb
 ```
 
 ## Helpful uv Commands
