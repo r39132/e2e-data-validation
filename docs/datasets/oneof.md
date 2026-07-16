@@ -136,11 +136,28 @@ is non-null per row. Proto3 enforces this at the language level; Parquet does no
 downstream writer could produce a record with both `text_data` and `numeric_data`
 non-null, and Parquet would accept it silently.
 
-To preserve the active-branch metadata explicitly, add a discriminator column:
+To preserve the active-branch metadata explicitly, add a discriminator column before
+writing to Parquet:
 
 ```python
 result["payload_case"] = message.WhichOneof("payload")  # e.g. "text_data", or None
 ```
+
+`WhichOneof("payload")` is a proto API call that returns the **name** of whichever
+field in the `oneof payload { ... }` group is currently set, as a string. If no
+branch is set it returns `None`. Storing this string as an extra Parquet column means
+a reader always knows exactly which branch was active, without having to guess from
+the null pattern:
+
+| `payload_case` | `text_data` | `numeric_data` | `flag_data` |
+|---|---|---|---|
+| `"text_data"` | `"Hello"` | `null` | `null` |
+| `"numeric_data"` | `null` | `42` | `null` |
+| `"flag_data"` | `null` | `null` | `true` |
+| `None` | `null` | `null` | `null` |
+
+The last row (`None`) shows the edge case where no branch was set — something that
+is impossible to distinguish from "all branches inactive" using only null patterns.
 
 See the [Proto3 vs Parquet Compatibility Analysis](../../Proto3_Parquet_Compatibility.md#21-oneof--mutual-exclusivity-lost)
 for the full recommendation.
