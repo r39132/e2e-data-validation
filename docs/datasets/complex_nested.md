@@ -110,7 +110,7 @@ level combines `MAP` and `STRUCT` in the same parent.
 
 The schema inference bug that was fixed during development (bracket-counting parser)
 was discovered specifically on this dataset. See
-[Results and Analysis](../Results_and_Analysis.md#2a-regex-could-not-handle-more-than-one-level-of-brace-nesting)
+[Common Pitfalls and Conversion Bugs](../common_pitfalls_and_conversion_bugs.md#2a-regex-based-parsing-fails-beyond-one-level-of-brace-nesting)
 for details.
 
 ## Validation Points

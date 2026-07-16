@@ -116,10 +116,12 @@ Click on any dataset name above to see detailed documentation including schema d
 
 ## Results and Analysis
 
-See **[Results and Analysis](docs/Results_and_Analysis.md)** for:
+See **[Pipeline Results](docs/Results.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
-- Bugs found and fixed during development
-- Detailed Protobuf → Parquet semantic mapping, including known information-loss cases (`oneof`, enum names, wire encoding variants)
+
+See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls_and_conversion_bugs.md)** for:
+- Bugs found during development, root causes, and fixes
+- General landmines for any PB3→Parquet Python pipeline
 
 ## Proto3 vs Parquet Compatibility
 
