@@ -10,7 +10,21 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 
 **📚 [Quick Start Guide](docs/QUICKSTART.md)** - Get started in 5 minutes
 
-## Project Structure
+## Table of Contents
+
+- [Project Structure](#project-structure)
+- [Pipeline Data Flow](#pipeline-data-flow)
+- [Test Datasets](#test-datasets)
+- [Pipeline Steps](#pipeline-steps)
+- [Recommendation: Generic PB3 → Parquet Conversion](#recommendation-generic-pb3--parquet-conversion)
+- [Results and Analysis](#results-and-analysis)
+- [Proto3 vs Parquet Compatibility](#proto3-vs-parquet-compatibility)
+- [Codebase Guide](#codebase-guide)
+- [Usage](#usage)
+
+---
+
+## Project Structure <sup>[↑](#table-of-contents)</sup>
 
 ```
 .
@@ -29,7 +43,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 └── pyproject.toml         # Project configuration
 ```
 
-## Pipeline Data Flow
+## Pipeline Data Flow <sup>[↑](#table-of-contents)</sup>
 
 ```mermaid
 graph TB
@@ -79,7 +93,7 @@ graph TB
 - **Output**: `.parquet` (columnar format)
 - **Validation**: Field-by-field comparison results
 
-## Test Datasets
+## Test Datasets <sup>[↑](#table-of-contents)</sup>
 
 The pipeline generates 8 comprehensive datasets covering all major Protobuf3 features:
 
@@ -106,7 +120,7 @@ Each dataset directory contains:
 
 Click on any dataset name above to see detailed documentation including schema definitions, Parquet mappings, validation points, and use cases.
 
-## Pipeline Steps
+## Pipeline Steps <sup>[↑](#table-of-contents)</sup>
 
 1. **Generate Datasets**: Create test data covering PB3 features
 2. **Schema Inference**: Generate Parquet schema from .proto files
@@ -114,7 +128,7 @@ Click on any dataset name above to see detailed documentation including schema d
 4. **Validation**: Verify data integrity between PB3 and Parquet
 5. **Reporting**: Generate success/failure reports
 
-## Recommendation: Generic PB3 → Parquet Conversion
+## Recommendation: Generic PB3 → Parquet Conversion <sup>[↑](#table-of-contents)</sup>
 
 ### Goal
 
@@ -194,7 +208,7 @@ in Parquet. Downstream consumers must be aware of these limitations:
 
 ---
 
-## Results and Analysis
+## Results and Analysis <sup>[↑](#table-of-contents)</sup>
 
 See **[Pipeline Results](docs/results.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
@@ -203,7 +217,7 @@ See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls.md)** for:
 - Bugs found during development, root causes, and fixes
 - General landmines for any PB3→Parquet Python pipeline
 
-## Proto3 vs Parquet Compatibility
+## Proto3 vs Parquet Compatibility <sup>[↑](#table-of-contents)</sup>
 
 See **[Java Considerations](docs/java_considerations.md)** for:
 - How a Java/`parquet-java` implementation differs from this Python/PyArrow pipeline
@@ -215,7 +229,7 @@ See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/compatibility_an
 - Recommendations on algorithms, libraries, and types to avoid
 - Coverage gaps and next steps
 
-## Codebase Guide
+## Codebase Guide <sup>[↑](#table-of-contents)</sup>
 
 See **[Codebase Guide](docs/codebase.md)** for:
 - Architecture overview and data flow
@@ -223,7 +237,7 @@ See **[Codebase Guide](docs/codebase.md)** for:
 - Key algorithms: varint reading, bracket-counting proto parser, schema-from-proto
 - Known limitations and their workarounds
 
-## Usage
+## Usage <sup>[↑](#table-of-contents)</sup>
 
 ```bash
 # Run the complete pipeline
