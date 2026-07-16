@@ -6,7 +6,7 @@ to prescribe the best practices for achieving reliable bidirectional compatibili
 
 **Related reading:**
 - [Results and Analysis](Results_and_Analysis.md) — empirical 8/8 pipeline pass data, bugs found and fixed
-- [Codebase Guide](docs/codebase.md) — how the pipeline code works
+- [Codebase Guide](codebase.md) — how the pipeline code works
 
 ---
 
@@ -286,4 +286,4 @@ Known Types** `Any`, `Struct`, and `ListValue` (structural incompatibility, requ
 custom handling or avoidance).
 
 See [Results and Analysis](Results_and_Analysis.md) for the full empirical evidence and
-[Codebase Guide](docs/codebase.md) for how the pipeline implements these algorithms.
+[Codebase Guide](codebase.md) for how the pipeline implements these algorithms.

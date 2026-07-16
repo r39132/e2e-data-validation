@@ -2,7 +2,7 @@
 
 This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) data to Apache Parquet format.
 
-**📚 [Quick Start Guide](QUICKSTART.md)** - Get started in 5 minutes
+**📚 [Quick Start Guide](docs/QUICKSTART.md)** - Get started in 5 minutes
 
 ## Project Structure
 
@@ -110,14 +110,14 @@ Click on any dataset name above to see detailed documentation including schema d
 
 ## Results and Analysis
 
-See **[Results and Analysis](Results_and_Analysis.md)** for:
+See **[Results and Analysis](docs/Results_and_Analysis.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
 - Bugs found and fixed during development
 - Detailed Protobuf → Parquet semantic mapping, including known information-loss cases (`oneof`, enum names, wire encoding variants)
 
 ## Proto3 vs Parquet Compatibility
 
-See **[Proto3 vs Parquet Data Type Compatibility Analysis](Proto3_Parquet_Compatibility.md)** for:
+See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/Proto3_Parquet_Compatibility.md)** for:
 - Master compatibility table reconciling empirical and analytical findings
 - Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)
 - Recommendations on algorithms, libraries, and types to avoid

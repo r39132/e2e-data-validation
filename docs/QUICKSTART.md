@@ -65,5 +65,5 @@ uv pip install -r requirements.txt
 
 1. Run the pipeline notebook to generate and test all datasets
 2. Check the `datasets/` directory for generated files
-3. Review individual dataset documentation in `docs/datasets/`
+3. Review individual dataset documentation in `datasets/`
 4. Examine validation results and reports

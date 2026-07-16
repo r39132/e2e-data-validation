@@ -159,7 +159,7 @@ the null pattern:
 The last row (`None`) shows the edge case where no branch was set — something that
 is impossible to distinguish from "all branches inactive" using only null patterns.
 
-See the [Proto3 vs Parquet Compatibility Analysis](../../Proto3_Parquet_Compatibility.md#21-oneof--mutual-exclusivity-lost)
+See the [Proto3 vs Parquet Compatibility Analysis](../Proto3_Parquet_Compatibility.md#21-oneof--mutual-exclusivity-lost)
 for the full recommendation.
 
 ## Validation Points
