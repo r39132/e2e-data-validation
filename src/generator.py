@@ -176,23 +176,28 @@ message BasicTypes {
 '''
         data = [
             {
-                "int32_field": 42,
-                "int64_field": 9223372036854775807,
-                "uint32_field": 4294967295,
-                "uint64_field": 18446744073709551615,
-                "float_field": 3.14,
-                "double_field": 2.718281828,
+                # Record 1: overflow boundaries (maximum positive values for each type)
+                "int32_field": 2147483647,            # INT32_MAX
+                "int64_field": 9223372036854775807,   # INT64_MAX
+                "uint32_field": 4294967295,           # UINT32_MAX
+                "uint64_field": 18446744073709551615, # UINT64_MAX
+                "float_field": 3.4028235e+38,         # FLT_MAX
+                "double_field": 1.7976931348623157e+308, # DBL_MAX
                 "bool_field": True,
                 "string_field": "Hello, Protobuf!",
                 "bytes_field": b"binary data"
             },
             {
-                "int32_field": -100,
-                "int64_field": -1234567890,
-                "uint32_field": 0,
-                "uint64_field": 12345,
-                "float_field": -99.9,
-                "double_field": 0.0,
+                # Record 2: underflow boundaries (minimum / most-negative values for each type)
+                # Signed integers: INT_MIN  Unsigned integers: 0 (no negative range)
+                # float/double: most-negative finite value (-FLT_MAX / -DBL_MAX)
+                # bool/string/bytes: no overflow/underflow concept; representative edge values used
+                "int32_field": -2147483648,           # INT32_MIN
+                "int64_field": -9223372036854775808,  # INT64_MIN
+                "uint32_field": 0,                    # UINT32_MIN
+                "uint64_field": 0,                    # UINT64_MIN
+                "float_field": -3.4028235e+38,        # -FLT_MAX (most-negative finite float)
+                "double_field": -1.7976931348623157e+308, # -DBL_MAX (most-negative finite double)
                 "bool_field": False,
                 "string_field": "Test 测试",
                 "bytes_field": b"\x00\x01\x02\xff"
