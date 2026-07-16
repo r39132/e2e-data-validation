@@ -412,7 +412,7 @@ String protoSchema = """
 
 ---
 
-## 6. Reading Parquet Back in Java
+## 7. Reading Parquet Back in Java
 
 When reading Parquet files back in Java:
 
@@ -428,7 +428,7 @@ do not apply. However, map key ordering remains non-deterministic in both langua
 
 ---
 
-## 7. `oneof`, `enum`, `Any`, `Struct` — Same Semantic Losses
+## 8. `oneof`, `enum`, `Any`, `Struct` — Same Semantic Losses
 
 These are format-level constraints, not language-level:
 
@@ -441,12 +441,12 @@ These are format-level constraints, not language-level:
 
 The recommendations in [compatibility_analysis.md](compatibility_analysis.md)
 (discriminator columns for `oneof`, string conversion for `enum`, avoid `Any`/`Struct`)
-apply equally to Java. The sealed interface pattern in section 5 above is a Java-native
+apply equally to Java. The sealed interface pattern in section 6 above is a Java-native
 way to partially recover `oneof` semantics in the writer layer.
 
 ---
 
-## 8. The `_upb` Bug is Python-Specific
+## 9. The `_upb` Bug is Python-Specific
 
 The `FieldDescriptor.label` instance-attribute bug documented in
 [Common Pitfalls §1](common_pitfalls.md#1-protobuf-7x--fielddescriptorlabel-not-available-as-instance-attribute)
@@ -456,7 +456,7 @@ not occur in Java.
 
 ---
 
-## 9. Library Stack Comparison
+## 10. Library Stack Comparison
 
 | Layer | Python (this project) | Java equivalent |
 |---|---|---|
@@ -469,7 +469,7 @@ not occur in Java.
 
 ---
 
-## 10. Verdict
+## 11. Verdict
 
 The Python/PyArrow stack is simpler for this specific conversion:
 
