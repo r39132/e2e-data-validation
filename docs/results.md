@@ -42,5 +42,5 @@ calls (`WhichOneof`, `HasField`), or dataset coverage that the current test suit
 not include.
 
 **Related reading:**
-- [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — bugs uncovered during development and their fixes
+- [Common Pitfalls and Conversion Bugs](common_pitfalls.md) — bugs uncovered during development and their fixes
 - [Data Format Compatibility Analysis](compatibility_analysis.md) — full type compatibility table and recommendations

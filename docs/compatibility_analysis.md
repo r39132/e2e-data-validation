@@ -6,7 +6,7 @@ to prescribe the best practices for achieving reliable bidirectional compatibili
 
 **Related reading:**
 - [Pipeline Results](results.md) — empirical 8/8 pipeline pass data
-- [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — bugs found during development and their fixes
+- [Common Pitfalls and Conversion Bugs](common_pitfalls.md) — bugs found during development and their fixes
 - [Codebase Guide](codebase.md) — how the pipeline code works
 
 ---
@@ -237,7 +237,7 @@ inner message fields do not appear as spurious top-level columns.  See
 | Layer | Recommended | Avoid | Reason |
 |---|---|---|---|
 | Schema inference | Python + PyArrow (direct from `.proto`) | `parquet-java` schema inference from data | Exact widths; no legacy non-compliant LIST/MAP encodings |
-| Serialization | `protobuf` Python package (v3.x or v4/v5 via `protoc`) | protobuf v7.x C-extension (`_upb`) without version-checking | v7 `FieldDescriptor` does not expose `.label` as instance attribute; see [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) |
+| Serialization | `protobuf` Python package (v3.x or v4/v5 via `protoc`) | protobuf v7.x C-extension (`_upb`) without version-checking | v7 `FieldDescriptor` does not expose `.label` as instance attribute; see [Common Pitfalls and Conversion Bugs](common_pitfalls.md) |
 | Parquet write | `pyarrow.parquet.write_table` | `fastparquet` for complex nested types | PyArrow has first-class `STRUCT`, `LIST`, `MAP` support; fastparquet's nested type support is incomplete |
 | Parquet read | `pyarrow.parquet.read_table` | pandas alone | Pandas converts `LIST` columns to numpy arrays and `MAP` columns to lists of tuples; always normalise before comparison (see [src/validator.py](src/validator.py)) |
 | Enum handling | Store as string OR use schema registry | Raw `int32` without documentation | Name loss is a real operational risk |

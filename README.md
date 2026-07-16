@@ -119,7 +119,7 @@ Click on any dataset name above to see detailed documentation including schema d
 See **[Pipeline Results](docs/results.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
 
-See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls_and_conversion_bugs.md)** for:
+See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls.md)** for:
 - Bugs found during development, root causes, and fixes
 - General landmines for any PB3→Parquet Python pipeline
 
