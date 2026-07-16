@@ -81,15 +81,65 @@ tested.
 
 ## Known Semantic Loss
 
-The **mutual exclusivity constraint is permanently lost** in Parquet. A Parquet reader
-cannot tell whether `numeric_data = 0` means "this field was set to zero" or "this
-field was not set" — both look identical. The proto `WhichOneof("payload")` information
-is gone.
+### Why `numeric_data` cannot reliably be `null` for inactive branches
 
-To preserve which branch was active, add a discriminator column before conversion:
+A natural question is: since `optional` fields map to nullable Parquet columns and
+`null` correctly represents "not set", why can't inactive `oneof` branches also be
+stored as `null`?
+
+The answer has two parts: one about the current pipeline, and one about the
+fundamental constraint.
+
+**1. How the current pipeline actually stores `oneof` scalars**
+
+Neither `converter.py` nor `validator.py` calls `WhichOneof()`. Both use
+`getattr(message, field.name)` for scalar fields, which returns the proto3 default
+value for any field that is not the active branch:
 
 ```python
-record["payload_case"] = message.WhichOneof("payload")  # e.g. "text_data"
+# What the converter does (simplified)
+result["numeric_data"] = getattr(message, "numeric_data")
+# Returns 0 when numeric_data is the inactive branch — not None
+```
+
+So for Record 1 (`text_data = "Hello"` is active), Parquet stores:
+
+```
+text_data    = "Hello"
+numeric_data = 0       ← inactive branch; looks like "set to zero"
+flag_data    = false   ← inactive branch; looks like "set to false"
+```
+
+This is the same behaviour as `optional` scalars in this pipeline: unset `optional`
+fields are also stored as `""` / `0` / `false` (not `null`) because the converter
+uses `getattr()` rather than `HasField()` for scalars. The difference is that
+`optional` has only one field to consider — an unset `optional int32` showing `0` in
+Parquet is unambiguous because there is nothing else competing for that column. With
+`oneof`, three fields share one logical slot, so `numeric_data = 0` is ambiguous.
+
+**2. The fix — and the remaining limitation after the fix**
+
+The converter *could* use `WhichOneof()` to detect the active branch and store `null`
+for the others:
+
+```python
+active = message.WhichOneof("payload")
+result["text_data"]    = getattr(message, "text_data")    if active == "text_data"    else None
+result["numeric_data"] = getattr(message, "numeric_data") if active == "numeric_data" else None
+result["flag_data"]    = getattr(message, "flag_data")    if active == "flag_data"    else None
+```
+
+With this fix, Record 1 would store `numeric_data = null` (inactive) rather than `0`,
+making it unambiguous. However, **one semantic constraint is still permanently lost**:
+the Parquet schema has no mechanism to enforce that *at most one* of the three columns
+is non-null per row. Proto3 enforces this at the language level; Parquet does not. A
+downstream writer could produce a record with both `text_data` and `numeric_data`
+non-null, and Parquet would accept it silently.
+
+To preserve the active-branch metadata explicitly, add a discriminator column:
+
+```python
+result["payload_case"] = message.WhichOneof("payload")  # e.g. "text_data", or None
 ```
 
 See the [Proto3 vs Parquet Compatibility Analysis](../../Proto3_Parquet_Compatibility.md#21-oneof--mutual-exclusivity-lost)
@@ -98,23 +148,5 @@ for the full recommendation.
 ## Validation Points
 
 ✓ Active field value correct in all three records  
-✓ Inactive fields are `null`  
+✓ Inactive fields are stored as proto3 defaults (0 / false / "") — validation passes  
 ✓ `id` string field alongside `oneof` fields round-trips correctly
-- No native union type
-- Multiple nullable columns (storage overhead)
-- Manual validation needed
-
-## Use Cases
-
-Oneof is ideal for:
-- Polymorphic data (different payload types)
-- Event payloads with various structures
-- API responses with multiple result types
-- Configuration options (string vs number vs boolean)
-
-## Best Practices
-
-1. Keep oneof alternatives to reasonable number (< 10)
-2. Document which field is set using a separate type/kind field
-3. Consider alternatives like tagged unions if Parquet is primary storage
-4. Validate oneof constraint after reading from Parquet
