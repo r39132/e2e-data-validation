@@ -16,7 +16,10 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 │   └── validator.py       # Validate conversion results
 ├── notebooks/             # Jupyter notebooks
 │   └── pipeline.ipynb     # Main pipeline execution notebook
-├── docs/                  # Dataset documentation
+├── docs/                  # Documentation
+│   ├── datasets/          # Per-dataset documentation
+│   ├── codebase.md        # Codebase guide
+│   └── README.md          # Docs index
 └── pyproject.toml         # Project configuration
 ```
 
@@ -76,14 +79,14 @@ The pipeline generates 8 comprehensive datasets covering all major Protobuf3 fea
 
 | Dataset | Features Tested | Files Generated |
 |---------|----------------|-----------------|
-| **[basic_types](docs/basic_types.md)** | All scalar primitives (int32, int64, uint32, uint64, float, double, bool, string, bytes) | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[nested_messages](docs/nested_messages.md)** | Hierarchical message structures, embedded objects | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[repeated_fields](docs/repeated_fields.md)** | Arrays/lists of primitives and messages | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[maps](docs/maps.md)** | Key-value pairs with primitive and message values | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[enums](docs/enums.md)** | Enumeration types with integer values | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[oneof](docs/oneof.md)** | Union types (mutually exclusive fields) | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[optional_fields](docs/optional_fields.md)** | Proto3 optional keyword, presence tracking | `.proto`, `.json`, `.pb3`, `.parquet` |
-| **[complex_nested](docs/complex_nested.md)** | Deep nesting with multiple features combined | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[basic_types](docs/datasets/basic_types.md)** | All scalar primitives (int32, int64, uint32, uint64, float, double, bool, string, bytes) | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[nested_messages](docs/datasets/nested_messages.md)** | Hierarchical message structures, embedded objects | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[repeated_fields](docs/datasets/repeated_fields.md)** | Arrays/lists of primitives and messages | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[maps](docs/datasets/maps.md)** | Key-value pairs with primitive and message values | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[enums](docs/datasets/enums.md)** | Enumeration types with integer values | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[oneof](docs/datasets/oneof.md)** | Union types (mutually exclusive fields) | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[optional_fields](docs/datasets/optional_fields.md)** | Proto3 optional keyword, presence tracking | `.proto`, `.json`, `.pb3`, `.parquet` |
+| **[complex_nested](docs/datasets/complex_nested.md)** | Deep nesting with multiple features combined | `.proto`, `.json`, `.pb3`, `.parquet` |
 
 ### File Types
 

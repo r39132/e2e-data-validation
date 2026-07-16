@@ -6,14 +6,14 @@ This directory contains detailed documentation for each test dataset used in the
 
 Each dataset tests specific Protobuf3 features:
 
-- [basic_types.md](basic_types.md) - Scalar primitive types
-- [nested_messages.md](nested_messages.md) - Nested message structures
-- [repeated_fields.md](repeated_fields.md) - Array/list fields
-- [maps.md](maps.md) - Map/dictionary fields
-- [enums.md](enums.md) - Enumeration types
-- [oneof.md](oneof.md) - Union types (oneof)
-- [optional_fields.md](optional_fields.md) - Optional field handling
-- [complex_nested.md](complex_nested.md) - Complex nested structures
+- [basic_types.md](datasets/basic_types.md) - Scalar primitive types
+- [nested_messages.md](datasets/nested_messages.md) - Nested message structures
+- [repeated_fields.md](datasets/repeated_fields.md) - Array/list fields
+- [maps.md](datasets/maps.md) - Map/dictionary fields
+- [enums.md](datasets/enums.md) - Enumeration types
+- [oneof.md](datasets/oneof.md) - Union types (oneof)
+- [optional_fields.md](datasets/optional_fields.md) - Optional field handling
+- [complex_nested.md](datasets/complex_nested.md) - Complex nested structures
 
 ## Dataset Structure
 
