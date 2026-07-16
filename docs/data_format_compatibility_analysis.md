@@ -5,7 +5,7 @@ complete picture of how every Proto3 type behaves when converted to Apache Parqu
 to prescribe the best practices for achieving reliable bidirectional compatibility.
 
 **Related reading:**
-- [Pipeline Results](Results.md) — empirical 8/8 pipeline pass data
+- [Pipeline Results](results.md) — empirical 8/8 pipeline pass data
 - [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — bugs found during development and their fixes
 - [Codebase Guide](codebase.md) — how the pipeline code works
 
@@ -286,5 +286,5 @@ discriminator column), **`enum`** (name loss, fixable at write time), and the **
 Known Types** `Any`, `Struct`, and `ListValue` (structural incompatibility, require
 custom handling or avoidance).
 
-See [Pipeline Results](Results.md) for the full empirical evidence and
+See [Pipeline Results](results.md) for the full empirical evidence and
 [Codebase Guide](codebase.md) for how the pipeline implements these algorithms.

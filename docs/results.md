@@ -19,4 +19,4 @@ All 8 datasets passed the full end-to-end pipeline (schema inference → PB3→P
 
 **Related reading:**
 - [Common Pitfalls and Conversion Bugs](common_pitfalls_and_conversion_bugs.md) — bugs uncovered during development and their fixes
-- [Data Format Compatibility Analysis](Data_Format_Compatibility_Analysis.md) — full type compatibility table and recommendations
+- [Data Format Compatibility Analysis](data_format_compatibility_analysis.md) — full type compatibility table and recommendations

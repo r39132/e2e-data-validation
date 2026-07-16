@@ -116,7 +116,7 @@ Click on any dataset name above to see detailed documentation including schema d
 
 ## Results and Analysis
 
-See **[Pipeline Results](docs/Results.md)** for:
+See **[Pipeline Results](docs/results.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
 
 See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls_and_conversion_bugs.md)** for:
@@ -125,7 +125,7 @@ See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls_and_conversion_
 
 ## Proto3 vs Parquet Compatibility
 
-See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/Data_Format_Compatibility_Analysis.md)** for:
+See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/data_format_compatibility_analysis.md)** for:
 - Master compatibility table reconciling empirical and analytical findings
 - Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)
 - Recommendations on algorithms, libraries, and types to avoid
