@@ -204,12 +204,163 @@ length-delimited framing so you don't have to.
 
 ---
 
-## 5. Java 17+ Language Features for This Pipeline
+## 5. Scalability: Generic vs Per-Dataset Code
+
+> **Critical architectural constraint:** A production pipeline must convert *any*
+> proto3 dataset to Parquet without writing custom code per schema. Any approach
+> that requires per-message Java classes, custom sealed interfaces, or hand-written
+> field mappings does not scale beyond a handful of datasets and is a non-starter
+> for a library that must handle tens of thousands of schemas.
+
+The Python pipeline in this project already satisfies this constraint:
+`schema_inference.py` and `converter.py` use proto reflection
+(`message.DESCRIPTOR.fields`) to process any message type at runtime — no per-dataset
+code exists or is needed.
+
+The Java equivalent requires the same approach: **`DynamicMessage` + runtime
+`Descriptor` loading**.
+
+### Java: Generic Converter Using `DynamicMessage`
+
+Instead of generating a typed Java class per proto message, load the descriptor at
+runtime and use `DynamicMessage` to process any schema:
+
+```java
+import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.FileDescriptor;
+import com.google.protobuf.DynamicMessage;
+import org.apache.parquet.proto.ProtoParquetWriter;
+import org.apache.parquet.proto.ProtoWriteSupport;
+
+public class GenericPb3ToParquetConverter {
+
+    /**
+     * Convert any .pb3 file to Parquet without generated code.
+     *
+     * @param descriptorSet  compiled FileDescriptorSet from `protoc --descriptor_set_out`
+     * @param messageType    message name, e.g. "BasicTypes"
+     * @param pb3Stream      length-delimited .pb3 input
+     * @param outputPath     Parquet output path
+     */
+    public static void convert(
+            FileDescriptorSet descriptorSet,
+            String messageType,
+            InputStream pb3Stream,
+            Path outputPath) throws Exception {
+
+        Descriptor descriptor = resolveDescriptor(descriptorSet, messageType);
+
+        ProtoWriteSupport.setWriteSpecsCompliant(true);
+
+        try (var writer = ProtoParquetWriter.builder(outputPath)
+                .withDescriptor(descriptor)        // schema from descriptor, not class
+                .withCompressionCodec(CompressionCodecName.SNAPPY)
+                .withRowGroupSize(128 * 1024 * 1024L)
+                .build()) {
+
+            DynamicMessage msg;
+            while ((msg = DynamicMessage.parseDelimitedFrom(descriptor, pb3Stream)) != null) {
+                writer.write(msg);
+            }
+        }
+    }
+
+    private static Descriptor resolveDescriptor(
+            FileDescriptorSet fds, String messageType) throws Exception {
+        var fileDescriptors = new HashMap<String, FileDescriptor>();
+        for (var fdProto : fds.getFileList()) {
+            var deps = fdProto.getDependencyList().stream()
+                    .map(fileDescriptors::get)
+                    .toArray(FileDescriptor[]::new);
+            var fd = FileDescriptor.buildFrom(fdProto, deps);
+            fileDescriptors.put(fdProto.getName(), fd);
+            var descriptor = fd.findMessageTypeByName(messageType);
+            if (descriptor != null) return descriptor;
+        }
+        throw new IllegalArgumentException("Message type not found: " + messageType);
+    }
+}
+```
+
+### Compiling a `FileDescriptorSet` at Build Time
+
+The `FileDescriptorSet` is a binary file produced once during the build — not once
+per dataset:
+
+```bash
+# Compile ALL .proto files into a single binary descriptor set
+protoc \
+  --descriptor_set_out=schema.pb \
+  --include_imports \
+  --proto_path=src/main/proto \
+  $(find src/main/proto -name "*.proto")
+```
+
+At runtime, load it once and convert any message type by name:
+
+```java
+var fds = FileDescriptorSet.parseFrom(Files.readAllBytes(Path.of("schema.pb")));
+
+// Same binary handles any number of schemas — no per-schema code
+new GenericPb3ToParquetConverter().convert(fds, "BasicTypes",   in1, out1);
+new GenericPb3ToParquetConverter().convert(fds, "ComplexNested", in2, out2);
+new GenericPb3ToParquetConverter().convert(fds, "Maps",          in3, out3);
+```
+
+### At Scale: Schema Registry Integration
+
+For tens of thousands of schemas, fetch descriptors from a registry at job start
+rather than bundling a compiled binary with the pipeline:
+
+| Registry | How to get the `Descriptor` |
+|---|---|
+| Confluent Schema Registry | `SchemaRegistryClient.getBySubjectAndId()` → parse `FileDescriptorProto` |
+| Buf Schema Registry | `buf export` → `FileDescriptorSet` binary |
+| Custom file store | Load `.pb` binary from S3/GCS/HDFS at job start |
+
+### Generic enum → string conversion (no hardcoded switch)
+
+In a generic pipeline, use the descriptor to look up enum names — never hardcode
+values:
+
+```java
+// Works for any enum type, any number of values, any schema
+FieldDescriptor field = descriptor.findFieldByName("status");
+int enumValue = (int) dynamicMessage.getField(field);
+String enumName = field.getEnumType().findValueByNumber(enumValue).getName();
+// Returns "APPROVED" for value 2 — driven entirely by the descriptor
+```
+
+### Generic `oneof` discriminator column
+
+Detect `oneof` fields via the descriptor and emit discriminator columns
+automatically — no custom code per message:
+
+```java
+// Emit a "<group>_case" column for every oneof group in the message
+for (var oneof : descriptor.getRealOneofs()) {
+    String activeField = oneof.getFields().stream()
+            .filter(dynamicMessage::hasField)
+            .map(FieldDescriptor::getName)
+            .findFirst()
+            .orElse(null);
+    row.put(oneof.getName() + "_case", activeField);
+}
+```
+
+---
+
+## 6. Java 17+ Language Features — Application Layer Only
+
+> **Scope:** The features below apply to application code built *on top of* the
+> generic pipeline (section 5), not to the pipeline itself. They require generating
+> typed Java classes from `.proto` files and are only appropriate for a small, fixed
+> set of well-known message types in an application — not for a generic converter.
 
 ### Records for immutable result types
 
 ```java
-// Java 17: use records instead of POJOs for validation results
 public record ValidationResult(boolean success, String message, List<String> details) {
     public static ValidationResult pass(String message) {
         return new ValidationResult(true, message, List.of());
@@ -220,53 +371,34 @@ public record ValidationResult(boolean success, String message, List<String> det
 }
 ```
 
-### Sealed interfaces to model `oneof` — partially recovers lost semantics
+### Sealed interfaces to model `oneof` — does not scale, application layer only
 
-Proto's `oneof` constraint cannot be expressed in Parquet schema, but in Java code
-you can use a sealed interface to at least enforce it in the writer layer:
+The sealed interface pattern gives compile-time enforcement of `oneof` semantics but
+**requires one interface per proto message with a `oneof` field**. It is only
+appropriate for a small, fixed set of known message types — not for a generic pipeline:
 
 ```java
-// Java 17: sealed interface models the oneof constraint before writing
+// NOT for a generic pipeline — only viable for a handful of known message types
 public sealed interface Payload
         permits Payload.TextData, Payload.NumericData, Payload.FlagData {
-
-    record TextData(String value) implements Payload {}
-    record NumericData(int value) implements Payload {}
-    record FlagData(boolean value) implements Payload {}
+    record TextData(String value)   implements Payload {}
+    record NumericData(int value)   implements Payload {}
+    record FlagData(boolean value)  implements Payload {}
 }
-
-// When building the Parquet row, use pattern matching (Java 21+):
-String payloadCase = switch (payload) {
-    case Payload.TextData t   -> "text_data";
-    case Payload.NumericData n -> "numeric_data";
-    case Payload.FlagData f   -> "flag_data";
-};
-// Write payloadCase as a discriminator column alongside the nullable value columns
 ```
 
-### Switch expressions for enum → string conversion
-
-```java
-// Java 17: use switch expressions to convert enum integers to strings
-String statusName = switch (statusInt) {
-    case 0 -> "UNKNOWN";
-    case 1 -> "PENDING";
-    case 2 -> "APPROVED";
-    case 3 -> "REJECTED";
-    default -> throw new IllegalArgumentException("Unknown status: " + statusInt);
-};
-```
+At scale, use the generic descriptor-based `oneof` detection shown in section 5
+instead.
 
 ### `var` for complex generic types
 
 ```java
-// Java 17: var reduces noise with deeply nested generic types
 var writer = ProtoParquetWriter.<MyMessage>builder(outputPath)
         .withMessage(MyMessage.class)
         .build();
 ```
 
-### Text blocks for inline `.proto` in tests (Java 15+)
+### Text blocks for inline `.proto` in tests
 
 ```java
 String protoSchema = """
