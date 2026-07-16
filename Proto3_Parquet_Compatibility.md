@@ -79,10 +79,12 @@ know which branch was set, at the cost of one extra column per group.
 
 ### 2.2 `enum` — names and range validation dropped
 
-Enum values are stored as `int32`.  The name-to-integer mapping lives only in the
-`.proto` file and is absent from the Parquet schema and file metadata.  Additionally,
-Parquet places no constraint on valid integer values, so a corrupt `int32` that has no
-corresponding enum variant will be silently read back without error.
+Parquet has no native enum type — the Parquet spec defines no enum logical annotation.
+The only option is to store enum values as their underlying `int32`.  The
+name-to-integer mapping lives only in the `.proto` file and is absent from the Parquet
+schema and file metadata.  Additionally, Parquet places no constraint on valid integer
+values, so a corrupt `int32` that has no corresponding enum variant will be silently
+read back without error.
 
 **Recommendation (pick one):**
 
