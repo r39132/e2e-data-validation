@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)
 ![PyArrow](https://img.shields.io/badge/PyArrow-14%2B-orange?logo=apache&logoColor=white)
-![Protobuf](https://img.shields.io/badge/protobuf-4.25%2B-brightgreen?logo=google&logoColor=white)
+![Protobuf](https://img.shields.io/badge/protobuf-7.x-brightgreen?logo=google&logoColor=white)
 ![Parquet](https://img.shields.io/badge/format-Parquet-blue?logo=apache&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue?logo=apache&logoColor=white)
 

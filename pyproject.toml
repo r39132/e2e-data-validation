@@ -9,7 +9,7 @@ authors = [
   {name = "Sid Anand"},
 ]
 dependencies = [
-    "protobuf>=4.25.0",
+    "protobuf>=7.0.0",
     "pyarrow>=14.0.0",
     "pandas>=2.1.0",
     "jupyter>=1.0.0",
