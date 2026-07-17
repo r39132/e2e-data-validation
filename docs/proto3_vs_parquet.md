@@ -259,75 +259,30 @@ set/not-set distinction correctly.
 
 ---
 
-## 6. Performance Characteristics
+## 6. Null and Missing Value Semantics
 
-| Dimension | Proto3 | Parquet |
+Proto3 and Parquet take fundamentally different approaches to absent data.  In proto3,
+absence for non-optional scalars is **implicit** — an unset field returns the same zero
+value as one explicitly set to `0`, `""`, or `false`, and there is no API to distinguish
+them.  Parquet makes absence **explicit** through definition levels, giving every column
+a three-way distinction: `NULL`, zero/empty, or a non-zero value.
+
+| Scenario | Proto3 | Parquet |
 |---|---|---|
-| **Single-record read latency** | Very low — deserialize one length-delimited record | High — must load at minimum one page (~1 MB row group header) |
-| **Full-table scan** | High I/O — must read all fields even if only one is needed | Low I/O — columnar layout skips unneeded columns |
-| **Point lookup** | N/A natively (no row index) | Possible with row-group statistics + row-group skipping |
-| **Compression ratio** | Moderate — varint packing, no cross-record compression | High — column similarity + dictionary/RLE + block compression |
-| **Write throughput** | Very high — sequential append of length-delimited records | Moderate — must buffer a full row group before flushing |
-| **Streaming writes** | Natural — append one record at a time | Awkward — Parquet files are closed/immutable once written |
+| **Non-optional scalar not set** | Returns the type's zero default; `HasField` is not supported — the caller cannot detect absence | Non-nullable column has no `NULL`; a value must always be written |
+| **`optional` scalar not set** | `HasField("f")` → `False`; `msg.f` still returns the zero default | Nullable column stores `NULL`, distinct from `""`, `0`, or `false` |
+| **Message field not set** | `HasField("f")` → `False`; accessing the field returns an empty default message, not `None` | Nullable `STRUCT` column stores `NULL` |
+| **`repeated` field empty** | Returns `[]`; cannot distinguish “never populated” from “explicitly cleared” | `LIST` column stores `[]`; a row never written stores `NULL` rather than `[]` |
 
 ---
 
-## 7. Null / Missing Value Semantics
-
-| Scenario | Proto3 behaviour | Parquet behaviour |
-|---|---|---|
-| Field not set (non-optional scalar) | Returns zero default (`0`, `""`, `false`); cannot detect absence | Column stores NULL if written with null; non-nullable column has no NULL |
-| Field not set (`optional` scalar) | `HasField()` → `False`; `msg.field` → zero default | Nullable column stores NULL |
-| Field not set (message type) | `HasField()` → `False` | Nullable STRUCT column stores NULL |
-| Repeated field empty | Returns empty list; indistinguishable from absent | LIST column stores empty list `[]` |
-
----
-
-## 8. Interoperability and Ecosystem
+## 7. Interoperability and Ecosystem
 
 | | Proto3 | Parquet |
 |---|---|---|
-| **Query engines** | Not directly queryable — must deserialize first | DuckDB, Spark, Presto/Trino, Athena, BigQuery, Hive |
-| **Streaming** | Kafka (with Schema Registry), gRPC, Pub/Sub | Delta Lake (microbatch), Iceberg streaming writes |
-| **Object stores** | Any (bytes are opaque) | S3, GCS, ADLS — first-class support via Hive/Spark/Athena |
+| **Query engines** | Most SQL engines require deserialization before querying; **Cloud Spanner** is a notable exception — it stores proto3 messages as a native column type and supports querying individual fields directly | DuckDB, Spark, Presto/Trino, Athena, BigQuery, Hive, Cloud Spanner |
+| **Streaming** | Kafka (with Schema Registry), gRPC, Cloud Pub/Sub | Spark Structured Streaming and Flink write Parquet in micro-batches; Delta Lake and Apache Iceberg wrap Parquet files in a transaction log to add streaming semantics |
+| **Object stores** | Any object store — bytes are opaque to the store itself; no native query support without deserialization | S3, GCS, ADLS — first-class integration via Hive, Spark, and Athena |
 | **Schema registry** | Confluent Schema Registry, Buf Schema Registry | Apache Atlas, Hive Metastore, Glue Data Catalog |
 | **Python** | `protobuf` package | `pyarrow`, `pandas`, `duckdb`, `fastparquet` |
 | **Java** | `protobuf-java`, `protoc` | `parquet-java`, `parquet-protobuf` |
-
----
-
-## 9. When to Use Each
-
-### Use Proto3 when:
-
-- Serializing messages for **network transport** (gRPC, REST with binary bodies)
-- Publishing to **event streams** (Kafka, Pub/Sub, Kinesis) where consumers receive
-  individual records
-- **Mobile / embedded** scenarios where binary size and parse speed matter
-- Schema must **evolve frequently** without coordinating with all consumers at once
-  (field-number stability)
-- The consumer needs **all fields** for every record (row-oriented access is optimal)
-
-### Use Parquet when:
-
-- Storing data in a **data lake** for analytics queries
-- Workloads access only a **subset of columns** across many rows (OLAP)
-- Data will be queried by **Spark, Athena, Presto, DuckDB, BigQuery**
-- **Compression ratio** is important (columnar layout compresses much better)
-- Data is written in **batches** rather than record by record
-
-### Use both (this project's pattern):
-
-Proto3 is often the **source of truth** for operational data (events, service outputs),
-and Parquet is the **analytical copy**.  The conversion pipeline in this project
-(schema inference → PB3→Parquet → validation) is the standard pattern for this
-architecture.
-
-```
-Producers → proto3 (Kafka / gRPC) → Conversion pipeline → Parquet (S3 / GCS)
-                                                                    ↓
-                                              Spark / Athena / DuckDB queries
-```
-
-See [recommendations.md](recommendations.md) for safe type subsets and best practices
-for operating this pipeline in production.
