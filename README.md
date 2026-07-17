@@ -10,7 +10,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 
 **📚 [Quick Start Guide](docs/QUICKSTART.md)** - Get started in 5 minutes
 
-## Table of Contents
+## <a id="table-of-contents"></a>Table of Contents
 
 - [Project Structure](#project-structure)
 - [Pipeline Data Flow](#pipeline-data-flow)
@@ -25,7 +25,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 
 ---
 
-## Project Structure <sup>[↑](#table-of-contents)</sup>
+## <a id="project-structure"></a>Project Structure <sup>[↑](#table-of-contents)</sup>
 
 ```
 .
@@ -47,7 +47,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 
 ---
 
-## Pipeline Data Flow <sup>[↑](#table-of-contents)</sup>
+## <a id="pipeline-data-flow"></a>Pipeline Data Flow <sup>[↑](#table-of-contents)</sup>
 
 ```mermaid
 graph TB
@@ -99,7 +99,7 @@ graph TB
 
 ---
 
-## Test Datasets <sup>[↑](#table-of-contents)</sup>
+## <a id="test-datasets"></a>Test Datasets <sup>[↑](#table-of-contents)</sup>
 
 The pipeline generates 8 comprehensive datasets covering all major Protobuf3 features:
 
@@ -128,7 +128,7 @@ Click on any dataset name above to see detailed documentation including schema d
 
 ---
 
-## Pipeline Steps <sup>[↑](#table-of-contents)</sup>
+## <a id="pipeline-steps"></a>Pipeline Steps <sup>[↑](#table-of-contents)</sup>
 
 1. **Generate Datasets**: Create test data covering PB3 features
 2. **Schema Inference**: Generate Parquet schema from .proto files
@@ -138,7 +138,7 @@ Click on any dataset name above to see detailed documentation including schema d
 
 ---
 
-## Recommendation: Generic PB3 → Parquet Conversion <sup>[↑](#table-of-contents)</sup>
+## <a id="recommendation-generic-pb3--parquet-conversion"></a>Recommendation: Generic PB3 → Parquet Conversion <sup>[↑](#table-of-contents)</sup>
 
 See **[Recommendations](docs/recommendations.md)** for the full analysis, but the headline findings are:
 
@@ -152,7 +152,7 @@ A single generic library (Python or Java) using reflection and descriptor APIs c
 
 ---
 
-## Results and Analysis <sup>[↑](#table-of-contents)</sup>
+## <a id="results-and-analysis"></a>Results and Analysis <sup>[↑](#table-of-contents)</sup>
 
 See **[Pipeline Results](docs/results.md)** for:
 - Full pipeline execution summary (8/8 datasets pass)
@@ -163,7 +163,7 @@ See **[Common Pitfalls and Conversion Bugs](docs/common_pitfalls.md)** for:
 
 ---
 
-## Proto3 vs Parquet Compatibility <sup>[↑](#table-of-contents)</sup>
+## <a id="proto3-vs-parquet-compatibility"></a>Proto3 vs Parquet Compatibility <sup>[↑](#table-of-contents)</sup>
 
 See **[Java Considerations](docs/java_considerations.md)** for:
 - How a Java/`parquet-java` implementation differs from this Python/PyArrow pipeline
@@ -177,7 +177,7 @@ See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/compatibility_an
 
 ---
 
-## Proto3 vs Parquet Format Comparison <sup>[↑](#table-of-contents)</sup>
+## <a id="proto3-vs-parquet-format-comparison"></a>Proto3 vs Parquet Format Comparison <sup>[↑](#table-of-contents)</sup>
 
 See **[Proto3 vs Parquet — Format Comparison](docs/proto3_vs_parquet.md)** for:
 - Design goals: per-record transport (proto3) vs columnar analytics (Parquet)
@@ -191,7 +191,7 @@ See **[Proto3 vs Parquet — Format Comparison](docs/proto3_vs_parquet.md)** for
 
 ---
 
-## Codebase Guide <sup>[↑](#table-of-contents)</sup>
+## <a id="codebase-guide"></a>Codebase Guide <sup>[↑](#table-of-contents)</sup>
 
 See **[Codebase Guide](docs/codebase.md)** for:
 - Architecture overview and data flow
@@ -201,7 +201,7 @@ See **[Codebase Guide](docs/codebase.md)** for:
 
 ---
 
-## Usage <sup>[↑](#table-of-contents)</sup>
+## <a id="usage"></a>Usage <sup>[↑](#table-of-contents)</sup>
 
 ```bash
 # Run the complete pipeline
