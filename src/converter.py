@@ -163,7 +163,13 @@ class PB3ToParquetConverter:
                 # Repeated scalar field
                 result[field.name] = list(value)
             else:
-                # Scalar field
+                # Scalar field — check for proto3 explicit presence (optional) fields first
+                try:
+                    if not message.HasField(field.name):
+                        result[field.name] = None
+                        continue
+                except ValueError:
+                    pass  # Regular non-optional scalar; HasField not supported
                 if field.type == field.TYPE_BYTES:
                     result[field.name] = bytes(value)
                 elif field.type == field.TYPE_ENUM:

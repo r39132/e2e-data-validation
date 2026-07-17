@@ -53,25 +53,25 @@ is not preserved.
 ```proto
 // Proto3 — only one of these three can be set at a time
 oneof payload {
-  string text_value    = 2;
-  int32  numeric_value = 3;
-  bool   flag_value    = 4;
+  string text_data    = 2;
+  int32  numeric_data = 3;
+  bool   flag_data    = 4;
 }
 ```
 
 ```
-# Parquet row for text_value = "hello":
-text_value="hello"   numeric_value=0   flag_value=false
+# Parquet row for text_data = "hello":
+text_data="hello"   numeric_data=0   flag_data=false
 ```
 
-A Parquet reader cannot distinguish `numeric_value = 0` (unset, defaulting to 0) from
-`numeric_value = 0` (explicitly set to 0).  `WhichOneof()` metadata is permanently lost.
+A Parquet reader cannot distinguish `numeric_data = 0` (unset, defaulting to 0) from
+`numeric_data = 0` (explicitly set to 0).  `WhichOneof()` metadata is permanently lost.
 
 **Recommendation:** Add a synthetic discriminator column before writing:
 
 ```python
 # Add before conversion
-record["payload_case"] = message.WhichOneof("payload")  # e.g. "text_value"
+record["payload_case"] = message.WhichOneof("payload")  # e.g. "text_data"
 ```
 
 The schema gains one `string` column per `oneof` group that lets downstream consumers

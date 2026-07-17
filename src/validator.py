@@ -3,6 +3,7 @@ Validate that PB3 and Parquet files contain equivalent data.
 """
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+import math
 import sys
 import pyarrow.parquet as pq
 import pandas as pd
@@ -197,6 +198,13 @@ class DataValidator:
             elif is_repeated:
                 result[field.name] = list(value)
             else:
+                # Check for proto3 explicit presence (optional) scalar fields first
+                try:
+                    if not message.HasField(field.name):
+                        result[field.name] = None
+                        continue
+                except ValueError:
+                    pass  # Regular non-optional scalar; HasField not supported
                 # Use try/except for field.type since _upb may not expose it
                 try:
                     from google.protobuf.descriptor import FieldDescriptor
@@ -303,7 +311,13 @@ class DataValidator:
         # Handle numeric comparisons with tolerance for float precision
         if isinstance(v1, (int, float)) and isinstance(v2, (int, float)):
             if isinstance(v1, float) or isinstance(v2, float):
-                return abs(float(v1) - float(v2)) < 1e-6
+                f1, f2 = float(v1), float(v2)
+                if f1 == f2:  # covers exact equality, +inf == +inf, -inf == -inf
+                    return True
+                if math.isnan(f1) or math.isnan(f2):
+                    return math.isnan(f1) and math.isnan(f2)
+                # Relative tolerance for large values; absolute tolerance near zero
+                return math.isclose(f1, f2, rel_tol=1e-6, abs_tol=1e-9)
             return int(v1) == int(v2)
         
         # Handle string comparisons
