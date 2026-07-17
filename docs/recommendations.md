@@ -1,6 +1,7 @@
 # Recommendations: Generic PB3 → Parquet Conversion
 
 **Related reading:**
+- [Proto3 vs Parquet — Format Comparison](proto3_vs_parquet.md) — design goals, encoding, schema evolution, and when to use each
 - [Compatibility Analysis](compatibility_analysis.md) — full type-level analysis with detailed rationale
 - [Java Considerations](java_considerations.md) — how to implement a generic converter in Java
 - [Codebase Guide](codebase.md) — how this project's Python pipeline is implemented

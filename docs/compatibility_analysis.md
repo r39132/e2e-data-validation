@@ -5,6 +5,7 @@ complete picture of how every Proto3 type behaves when converted to Apache Parqu
 to prescribe the best practices for achieving reliable bidirectional compatibility.
 
 **Related reading:**
+- [Proto3 vs Parquet — Format Comparison](proto3_vs_parquet.md) — design goals, encoding, schema evolution, and when to use each
 - [Pipeline Results](results.md) — empirical 8/8 pipeline pass data
 - [Common Pitfalls and Conversion Bugs](common_pitfalls.md) — bugs found during development and their fixes
 - [Java Considerations](java_considerations.md) — how a Java implementation would differ
