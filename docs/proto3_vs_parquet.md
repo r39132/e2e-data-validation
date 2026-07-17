@@ -13,7 +13,94 @@ question of *how* proto3 types translate to Parquet when converting between the 
 
 ---
 
-## 1. Design Goals
+## 1. Format at a Glance
+
+The fastest way to understand the difference is to see the same data in both formats.
+
+Consider three `Person` records:
+
+| id | name  | email             |
+|----|-------|-------------------|
+| 1  | Alice | alice@example.com |
+| 2  | Bob   | bob@example.com   |
+| 3  | Carol | *(not set)*       |
+
+### 1.1 Proto3
+
+Schema (`.proto` file — the schema is **not** embedded in the binary):
+
+```proto
+syntax = "proto3";
+
+message Person {
+  int32          id    = 1;
+  string         name  = 2;
+  optional string email = 3;
+}
+```
+
+Binary file: a flat stream of varint-length-prefixed records.  Each record contains
+only its own fields encoded as *tag–value* pairs, where the tag encodes the field
+number and wire type.  An absent field (`email` for Carol) is simply omitted — zero
+bytes consumed:
+
+```
+[varint len][encoded message bytes]
+
+Record 1 (Alice, 28 bytes):
+  1c  08 01  12 05 41 6c 69 63 65  1a 11 61 6c 69 63 65 40 65 78 61 6d 70 6c 65 2e 63 6f 6d
+  ^28 ^id=1  ^name(5)="Alice"      ^email(17)="alice@example.com"
+
+Record 2 (Bob, 24 bytes):
+  18  08 02  12 03 42 6f 62  1a 0f 62 6f 62 40 65 78 61 6d 70 6c 65 2e 63 6f 6d
+  ^24 ^id=2  ^name(3)="Bob"  ^email(15)="bob@example.com"
+
+Record 3 (Carol, 9 bytes — email absent, zero bytes written):
+  09  08 03  12 05 43 61 72 6f 6c
+  ^9  ^id=3  ^name(5)="Carol"
+```
+
+Key properties:
+- **Row-oriented**: all fields for one record are contiguous in the byte stream
+- **Schema-free binary**: a reader needs the compiled `.proto` or a descriptor pool to decode the bytes
+- **Sparse-friendly**: absent fields cost zero bytes regardless of field number
+- **Streamable**: records can be appended indefinitely; no file finalisation step
+
+### 1.2 Parquet
+
+The same three records in a `.parquet` file.  All values for one column are stored
+together in a *column chunk*, so a query that reads only `id` skips `name` and `email`
+entirely without touching their bytes:
+
+```
+Magic: PAR1
+│
+├── Row Group 0  (3 rows)
+│     ├── Column chunk: id     INT32    [1, 2, 3]
+│     ├── Column chunk: name   STRING   ["Alice", "Bob", "Carol"]
+│     └── Column chunk: email  STRING   ["alice@example.com", "bob@example.com", NULL]
+│                                                                              ^^^^
+│                              NULL stored via definition levels — distinct from ""
+│
+└── File Footer  (Thrift-encoded, written last)
+      ├── Schema: message Person {
+      │             required int32  id;
+      │             required binary name  (STRING);
+      │             optional binary email (STRING);
+      │           }
+      └── Row group metadata: 3 rows, byte offsets and sizes per column chunk
+Magic: PAR1
+```
+
+Key properties:
+- **Column-oriented**: all `id` values are adjacent; reading one column skips all others
+- **Self-describing**: schema is embedded in the file footer — no external schema source needed
+- **NULL-aware**: Carol's absent `email` is stored as a proper `NULL` via Parquet definition levels, not as `""`
+- **Batch-oriented**: the footer is written last; the file cannot be read until writing is finalised
+
+---
+
+## 2. Design Goals
 
 |  | **Proto3** | **Apache Parquet** |
 |---|---|---|
@@ -29,9 +116,9 @@ batch analytics where only a fraction of columns are read per query.
 
 ---
 
-## 2. Data Model
+## 3. Data Model
 
-### 2.1 Orientation
+### 3.1 Orientation
 
 **Proto3** is **row-oriented**.  Each serialized message contains all fields for one
 record, laid out sequentially:
@@ -59,7 +146,7 @@ within a row group, so a query touching two columns skips the rest entirely:
 └──────────────────────────────────────────────────┘
 ```
 
-### 2.2 Type Systems
+### 3.2 Type Systems
 
 Proto3 has a **richer logical type system** tuned for message semantics:
 
@@ -90,9 +177,9 @@ Notable **gaps**: Parquet has no native `enum`, `oneof`/union, `uint32`/`uint64`
 
 ---
 
-## 3. Wire Encoding
+## 4. Wire Encoding
 
-### 3.1 Proto3 wire format
+### 4.1 Proto3 wire format
 
 Each field in a proto3 message is encoded as a *tag–value* pair.  The tag combines
 the field number and a wire type:
@@ -111,7 +198,7 @@ This makes proto3 files compact when fields are sparse.
 `int32`/`int64` encode negative values as 10-byte varints (wasteful for small
 negative numbers).
 
-### 3.2 Parquet encoding
+### 4.2 Parquet encoding
 
 Parquet applies encoding **per column chunk**, choosing the most efficient strategy:
 
@@ -129,9 +216,9 @@ giving compressors much more to work with than row-oriented formats.
 
 ---
 
-## 4. Schema
+## 5. Schema
 
-### 4.1 How schema is defined
+### 5.1 How schema is defined
 
 **Proto3**: Schema lives in `.proto` source files and is compiled into language-specific
 code by `protoc`.  The schema is NOT embedded in the binary file — a reader must have
@@ -141,7 +228,7 @@ the compiled generated code (or a descriptor pool) to interpret the bytes.
 `FileMetaData` structure.  Any reader can inspect or decode the file without a separate
 schema source.
 
-### 4.2 Schema evolution
+### 5.2 Schema evolution
 
 This is the most important practical difference for long-lived data pipelines:
 
@@ -158,7 +245,7 @@ column names**.  Renaming a proto field is free at the wire level — you can re
 `user_id` to `userId` in the `.proto` without touching the binary.  Renaming a Parquet
 column breaks every downstream reader that references it by name.
 
-### 4.3 Nullability
+### 5.3 Nullability
 
 **Proto3 (non-optional scalars)**: All scalar fields have implicit defaults (`0`, `""`,
 `false`).  An absent field is indistinguishable from one explicitly set to its zero
@@ -172,7 +259,7 @@ set/not-set distinction correctly.
 
 ---
 
-## 5. Performance Characteristics
+## 6. Performance Characteristics
 
 | Dimension | Proto3 | Parquet |
 |---|---|---|
@@ -185,7 +272,7 @@ set/not-set distinction correctly.
 
 ---
 
-## 6. Null / Missing Value Semantics
+## 7. Null / Missing Value Semantics
 
 | Scenario | Proto3 behaviour | Parquet behaviour |
 |---|---|---|
@@ -196,7 +283,7 @@ set/not-set distinction correctly.
 
 ---
 
-## 7. Interoperability and Ecosystem
+## 8. Interoperability and Ecosystem
 
 | | Proto3 | Parquet |
 |---|---|---|
@@ -209,7 +296,7 @@ set/not-set distinction correctly.
 
 ---
 
-## 8. When to Use Each
+## 9. When to Use Each
 
 ### Use Proto3 when:
 
