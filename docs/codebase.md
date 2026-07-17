@@ -8,6 +8,7 @@ data to Apache Parquet and validates the round-trip fidelity field-by-field.
 - [README](../README.md) — quick start and project structure
 - [Pipeline Results](results.md) — empirical results, bugs found and fixed
 - [Common Pitfalls and Conversion Bugs](common_pitfalls.md) — root causes and fixes for bugs encountered
+- [Proto3 vs Parquet — Format Comparison](proto3_vs_parquet.md) — design goals, encoding, schema evolution, and when to use each
 - [Proto3 vs Parquet Compatibility](compatibility_analysis.md) — type compatibility analysis and recommendations
 
 ---

@@ -6,6 +6,7 @@ targeting **Java 17 LTS** as the minimum and noting Java 21 LTS improvements whe
 applicable.
 
 **Related reading:**
+- [Proto3 vs Parquet — Format Comparison](proto3_vs_parquet.md) — design goals, encoding, schema evolution, and when to use each
 - [Compatibility Analysis](compatibility_analysis.md) — full type compatibility table (format-level; applies to both languages)
 - [Common Pitfalls](common_pitfalls.md) — Python-specific bugs and fixes
 - [Codebase Guide](codebase.md) — how the Python pipeline is implemented

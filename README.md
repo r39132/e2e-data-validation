@@ -19,6 +19,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 - [Recommendation: Generic PB3 → Parquet Conversion](#recommendation-generic-pb3--parquet-conversion)
 - [Results and Analysis](#results-and-analysis)
 - [Proto3 vs Parquet Compatibility](#proto3-vs-parquet-compatibility)
+- [Proto3 vs Parquet Format Comparison](#proto3-vs-parquet-format-comparison)
 - [Codebase Guide](#codebase-guide)
 - [Usage](#usage)
 
@@ -39,6 +40,7 @@ This project provides end-to-end testing for converting Protocol Buffer 3 (PB3) 
 ├── docs/                  # Documentation
 │   ├── datasets/          # Per-dataset documentation
 │   ├── codebase.md        # Codebase guide
+│   ├── proto3_vs_parquet.md  # Format comparison: design, encoding, schema evolution
 │   └── README.md          # Docs index
 └── pyproject.toml         # Project configuration
 ```
@@ -172,6 +174,20 @@ See **[Proto3 vs Parquet Data Type Compatibility Analysis](docs/compatibility_an
 - Detailed analysis of problematic types (`oneof`, `enum`, `Any`, `Struct`)
 - Recommendations on algorithms, libraries, and types to avoid
 - Coverage gaps and next steps
+
+---
+
+## Proto3 vs Parquet Format Comparison <sup>[↑](#table-of-contents)</sup>
+
+See **[Proto3 vs Parquet — Format Comparison](docs/proto3_vs_parquet.md)** for:
+- Design goals: per-record transport (proto3) vs columnar analytics (Parquet)
+- Data model: row-oriented vs column-oriented layout
+- Type systems: proto3 rich logical types vs Parquet physical+annotation model
+- Wire encoding: varint tag–value pairs vs per-column encoding strategies
+- Schema evolution: field-number stability (proto3) vs name-based identity (Parquet)
+- Null/missing value semantics
+- Performance characteristics and ecosystem comparison
+- Decision guide: when to use each, and the dual-format pipeline pattern
 
 ---
 
